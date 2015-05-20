@@ -40,9 +40,19 @@ panel.cor <- function(x, y, digits = 2, cex.cor, ...)
   if(p<0.01) txt2 <- paste("p= ", "<0.01", sep = "")
   text(0.5, 0.4, txt2)
 }
-
-
-
-
-
+# install.packages("leaps")
+# library(leaps)
+install.packages("AUCRF")
+library(AUCRF)
+fit = AUCRF(units~.,data = merged_weather_2_5)
+# out.exh = regsubsets(units~., data = merged_weather_2_5)
+# There are 45 stores and 111 items, training 45*111 models for each item at each store
+for (i in 1:45){
+  for (j in 1:111){
+    mydata = filter(merged_train, store_nbr == i,item_nbr == j)
+    merged_weather = merge(weather,mydata, by = c("date","station_nbr"))
+    fit = AUCRF(units~.,)
+    
+  }
+}
 
