@@ -7,8 +7,6 @@ install.packages("dplyr")
 library(dplyr)
 install.packages("varSelRF")
 library(varSelRF)
-
-
 # Read into dateset
 train = read.csv(file = "train.csv")
 weather = read.csv(file = "weather.csv")
