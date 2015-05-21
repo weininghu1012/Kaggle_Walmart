@@ -43,7 +43,7 @@ m_2_5 = merged_train[merged_train$store_nbr == 2 & merged_train$item_nbr == 5,]
 merged_weather_1_5 = merge(weather,train_1_5, by = c("date","station_nbr"))
 m_w_2_5 = merge(weather,m_2_5, by = c("date","station_nbr"))
 rf.vs1 = varSelRF(m_w_2_5, units, ntree = 500, ntreeIterat = 300,vars.drop.frac = 0.2)
-
+fit_2_5 = randomForest(units ~ day+tavg+preciptotal, data=m_w_2_5, ntree=myNtree, mtry=5, importance=myImportance)
 panel.cor <- function(x, y, digits = 2, cex.cor, ...)
 {
   usr <- par("usr"); on.exit(par(usr))
