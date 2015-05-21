@@ -1,6 +1,18 @@
 # Walmart Kaggle competition
+# This package is to get the day of the week from date 
+install.packages("lubridate")
+library("lubridate")
+# This package is for manipulating data
+install.packages("dplyr")
+library(dplyr)
+install.packages("varSelRF")
+library(varSelRF)
+
+
+# Read into dateset
 train = read.csv(file = "train.csv")
 weather = read.csv(file = "weather.csv")
+merged_train = read.csv(file = "merged_train.csv")
 # key is to map the store number with the station number so linked back to weather
 key = read.csv(file = "key.csv")
 test = read.csv(file = "test.csv")
@@ -11,17 +23,26 @@ names(weather)
 # "stnpressure" "sealevel"    "resultspeed"
 # [19] "resultdir"   "avgspeed"  
 # Get sub of the train data that items are not 0
-install.packages("dplyr")
-library(dplyr)
-# Merge the data in key.csv into train
-merged_train = merge(train,key, by = "store_nbr")
+
+#Create a function featureEngineer to perform same operations on train and test data
+featureEngineer = function(df){
+  date = df$date
+  df$day = wday(as.Date(date))
+  merged_df = merge(df,key, by = "store_nbr")
+}
+
+# Write the merged files into disk
+merged_train = featureEngineer(train)
+merged_test = featureEngineer(test)
 write.csv(merged_train, file = "merged_train.csv")
-pos_train = filter(train,units > 0)
+write.csv(merged_test, file = "merged_test.csv")
+merged_train = read.csv(file = "merged_train.csv")
 # Noticing that item#5 occurs quite often, choose it as an example to check relationship between data
-train_1_5 = filter(merged_train, store_nbr == 1,item_nbr == 5)
-train_2_5 = filter(merged_train, store_nbr == 2,item_nbr == 5)
+
+m_2_5 = merged_train[merged_train$store_nbr == 2 & merged_train$item_nbr == 5,]
 merged_weather_1_5 = merge(weather,train_1_5, by = c("date","station_nbr"))
-merged_weather_2_5 = merge(weather,train_2_5, by = c("date","station_nbr"))
+m_w_2_5 = merge(weather,m_2_5, by = c("date","station_nbr"))
+rf.vs1 = varSelRF(m_w_2_5, units, ntree = 500, ntreeIterat = 300,vars.drop.frac = 0.2)
 
 panel.cor <- function(x, y, digits = 2, cex.cor, ...)
 {
@@ -49,7 +70,7 @@ fit = AUCRF(units~.,data = merged_weather_2_5)
 # There are 45 stores and 111 items, training 45*111 models for each item at each store
 for (i in 1:45){
   for (j in 1:111){
-    mydata = filter(merged_train, store_nbr == i,item_nbr == j)
+    mydata = merged_train[merged_train$store_nbr == i & merged_train$item_nbr == j,]
     merged_weather = merge(weather,mydata, by = c("date","station_nbr"))
     fit = AUCRF(units~.,)
     
