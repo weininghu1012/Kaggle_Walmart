@@ -7,10 +7,52 @@ install.packages("dplyr")
 library(dplyr)
 install.packages("varSelRF")
 library(varSelRF)
+install.packages("randomForest")
+library(randomForest)
 # Read into dateset
-train = read.csv(file = "train.csv")
+train = read.csv(file = "train.csv",colClasses=c("Date",# date
+                                                 "int", # station_nbr
+                                                 "numeric",#tmax
+                                                 "numeric",#tmin
+                                                 "numeric",#tavg
+                                                 "numeric",#depart
+                                                 "numeric",#dewpoint
+                                                 "numeric",#wetbulb
+                                                 "numeric",#heat
+                                                 "numeric",#cool
+                                                 "numeric",#sunrise
+                                                 "numeric",#sunset
+                                                 "character",#codesum
+                                                 "numeric",#snowfall
+                                                 "numeric",#preciptotal
+                                                 "numeric",#sealevel
+                                                 "numeric", #resultspeed
+                                                 "numeric", # resultdir
+                                                 "numeric",#avgspeed
+                                                 ))
 weather = read.csv(file = "weather.csv")
-merged_train = read.csv(file = "merged_train.csv")
+                   colClasses=c("int", # station_nbr
+                                                    "Date",# date
+                                                    "numeric",#tmax
+                                                    "numeric",#tmin
+                                                    "numeric",#tavg
+                                                    "numeric",#depart
+                                                    "numeric",#dewpoint
+                                                    "numeric",#wetbulb
+                                                    "numeric",#heat
+                                                    "numeric",#cool
+                                                    "numeric",#sunrise
+                                                    "numeric",#sunset
+                                                    "character",#codesum
+                                                    "numeric",#snowfall
+                                                    "numeric",#preciptotal
+                                                    "numeric", # stnpressure
+                                                    "numeric",#sealevel
+                                                    "numeric", #resultspeed
+                                                    "numeric", # resultdir
+                                                    "numeric"#avgspeed
+                                                    ))
+
 # key is to map the store number with the station number so linked back to weather
 key = read.csv(file = "key.csv")
 test = read.csv(file = "test.csv")
@@ -38,9 +80,9 @@ merged_train = read.csv(file = "merged_train.csv")
 # Noticing that item#5 occurs quite often, choose it as an example to check relationship between data
 
 m_2_5 = merged_train[merged_train$store_nbr == 2 & merged_train$item_nbr == 5,]
-merged_weather_1_5 = merge(weather,train_1_5, by = c("date","station_nbr"))
+
 m_w_2_5 = merge(weather,m_2_5, by = c("date","station_nbr"))
-rf.vs1 = varSelRF(m_w_2_5, units, ntree = 500, ntreeIterat = 300,vars.drop.frac = 0.2)
+
 fit_2_5 = randomForest(units ~ day+tavg+preciptotal, data=m_w_2_5, ntree=myNtree, mtry=5, importance=myImportance)
 panel.cor <- function(x, y, digits = 2, cex.cor, ...)
 {
